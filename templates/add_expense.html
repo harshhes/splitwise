@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Expense Added Notification</title>
+  </head>
+  <body>
+    <p>Hi {{ email }},</p>
+
+    <p>A new expense has been added in Splitwise:</p>
+
+    <ul>
+      <li><strong>Expense Payer:</strong> {{ payer }}</li>
+      <li><strong>Expense Name:</strong> {{ name }}</li>
+      <li><strong>Amount:</strong> {{ amount }}</li>
+      <li>
+        <strong>Participants:</strong>
+        {% for participant in participants %} {{participant }}, {% endfor %}
+      </li>
+    </ul>
+
+    <p>Thank you for using Splitwise!</p>
+
+    <p>
+      Best regards,<br />
+      Splitwise Team
+    </p>
+  </body>
+</html>
