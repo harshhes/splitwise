@@ -9,7 +9,8 @@ from oauthlib import common
 
 from .serializer import ExpenseGroupSerializer
 from .models import User, ExpenseGroup, ExpenseParticipant
-from .utils import ExpenseType, HTTPResponse, get_user, send_email
+from .utils import ExpenseType, HTTPResponse, get_user
+from .tasks import send_async_email
 
 
 class LoginService:
@@ -94,7 +95,8 @@ class ExpenseManager:
 
                 expense_participants = ExpenseParticipant.objects.bulk_create(data)
                 for i in participants:
-                    send_email(recipients=i, data={"email":i, "amount":amount, "name":name, "participants": [pps], "payer":payer})
+                    send_async_email.delay(recipients=i, data={"email":i, "amount":amount, "name":name, "participants": [pps], "payer":payer})
+                    print("async email sent")
                 return HTTPResponse(200).success_response(f"{name} Expense Added")
 
         elif expense_type == ExpenseType.exact.value:
@@ -120,7 +122,7 @@ class ExpenseManager:
 
             expense_participants = ExpenseParticipant.objects.bulk_create(data) 
             for i in participants.keys():
-                send_email(recipients=i, data={"email":i, "amount":amount, "name":name, "participants": participants.keys(), "payer":payer})
+                send_async_email.delay(recipients=i, data={"email":i, "amount":amount, "name":name, "participants": participants.keys(), "payer":payer})
             return HTTPResponse(200).success_response(f"{name} Expense Added")
 
         else:
@@ -143,7 +145,7 @@ class ExpenseManager:
                     ]
                     expense_participants = ExpenseParticipant.objects.bulk_create(data) 
                     for i in participants.keys():
-                        send_email(recipients=i, data={"email":i, "amount":amount, "name":name, "participants": participants.keys(), "payer":payer})
+                        send_async_email.delay(recipients=i, data={"email":i, "amount":amount, "name":name, "participants": participants.keys(), "payer":payer})
                     return HTTPResponse(200).success_response(f"{name} Expense Added")
                 
         traceback.print_exc()
